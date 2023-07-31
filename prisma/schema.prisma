@@ -1,0 +1,489 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "sqlserver"
+  url      = env("DATABASE_URL")
+}
+
+model AttachFiles {
+  IdAttach                  Int       @id(map: "PK_AttachFiles") @default(autoincrement())
+  AttachTypeTab             Int?
+  AttachType                Int?
+  AttachTypeName            String?   @db.NVarChar(50)
+  AttachFileUrl             String?   @db.NVarChar(512)
+  IsDelete                  Int?
+  CreatedDate               DateTime? @db.DateTime
+  EmployeeId                Int
+  IsProbation               Boolean?
+  IsPersonalDevelopmentPlan Boolean?
+}
+
+model Campaigns {
+  CampaignId   Int       @id(map: "PK_Campaigns") @default(autoincrement())
+  CompanyId    Int?
+  ClientId     Int?
+  CampaignName String?   @db.NVarChar(128)
+  CampaignDesc String?   @db.NVarChar(256)
+  CampaignType String?   @db.VarChar(32)
+  StartDate    DateTime? @db.DateTime
+  EndDate      DateTime? @db.DateTime
+  CreatedDate  DateTime? @default(now(), map: "DF_Campaigns_CreateDate") @db.DateTime
+  Active       Boolean?  @default(true, map: "DF_Campaigns_Active")
+  Deleted      Boolean?
+}
+
+model Clients {
+  ClientId   Int       @id(map: "PK_Clients_1") @default(autoincrement())
+  ClientCode String?   @db.VarChar(32)
+  ClientName String?   @db.NVarChar(128)
+  StartDate  DateTime? @db.DateTime
+  EndDate    DateTime? @db.DateTime
+  CreateDate DateTime? @default(now(), map: "DF__Clients_CreateDate") @db.DateTime
+  Active     Boolean?  @default(true, map: "DF__Clients_Active")
+}
+
+model Company {
+  CompanyId   Int       @id(map: "PK_Clients") @default(autoincrement())
+  CompanyCode String?   @db.VarChar(32)
+  CompanyName String?   @db.NVarChar(128)
+  StartDate   DateTime? @db.DateTime
+  EndDate     DateTime? @db.DateTime
+  CreateDate  DateTime? @default(now(), map: "DF_Clients_CreateDate") @db.DateTime
+  Active      Boolean?
+  ProvinceId  Int?
+  Address     String?   @db.NVarChar(256)
+  Group       String?   @db.NVarChar(256)
+}
+
+model Departments {
+  DepartmentId           Int      @id(map: "PK_Departments") @default(autoincrement())
+  CompanyId              Int?
+  DepartmentCode         String   @db.NVarChar(32)
+  DepartmentName         String   @db.NVarChar(256)
+  Active                 Boolean  @default(true, map: "DF_Departments_Active")
+  CreatedDate            DateTime @default(now(), map: "DF_Departments_CreatedDate") @db.DateTime
+  AllowCompensationLeave Boolean?
+}
+
+model DependentPerson {
+  IdDependent         Int       @id(map: "PK_DependentPerson") @default(autoincrement())
+  DependentPersonName String?   @db.NVarChar(128)
+  Relationship        String?   @db.NVarChar(50)
+  DateOfBirth         DateTime? @db.DateTime
+  NumberDependent     Int?
+  TaxcodeDependent    String?   @db.VarChar(50)
+  CreatedDate         DateTime? @db.DateTime
+  UpdatedDate         DateTime? @db.DateTime
+}
+
+model DismissalFromWork {
+  IdDismissal      Int       @id(map: "PK_DismissalFromWork") @default(autoincrement())
+  EmployeeId       Int?
+  EmployeeCode     String?   @db.VarChar(128)
+  WorkUnit         Int?
+  AppointmentUnit  Int?
+  DecisionNumber   String?   @db.VarChar(128)
+  PositionId       Int?
+  NewJobPosition   Int?
+  DismissalProcess Int?
+  Status           Int?
+  IsDelete         Int?
+  CreatedDate      DateTime? @db.DateTime
+  UpdatedDate      DateTime? @db.DateTime
+}
+
+model DocumentTypes {
+  DocumentType Int     @id(map: "PK_DocumentTypes") @default(autoincrement())
+  DocumentName String? @db.NVarChar(128)
+  RequireTotal Int?
+}
+
+model EmailLogs {
+  EmailId         Int       @id(map: "PK_EmailLogs") @default(autoincrement())
+  EmailOf         String?   @db.VarChar(32)
+  RefId           Int?
+  MailTo          String?   @db.VarChar(512)
+  MailCc          String?   @db.VarChar(512)
+  MailBcc         String?   @db.VarChar(512)
+  EmailSubject    String?   @db.NVarChar(256)
+  EmailBody       String?   @db.NVarChar(Max)
+  FileAttachments String?   @db.NVarChar(512)
+  CreateAt        DateTime? @db.DateTime
+  SendAt          DateTime? @db.DateTime
+  EmailStatus     Int?
+  MailItem_Id     Int?
+  CreateBy        Int?
+}
+
+model EmployeeAccounts {
+  UserId      Int      @id(map: "PK_EmployeeAccounts") @default(autoincrement())
+  EmployeeId  Int      @unique(map: "IX_EmployeeAccounts")
+  UserName    String   @db.VarChar(128)
+  Password    String   @db.VarChar(256)
+  CreatedDate DateTime @default(now(), map: "DF_EmployeeAccounts_CreatedDate") @db.DateTime
+}
+
+model EmployeeAccountTokens {
+  Id          Int      @id(map: "PK_EmployeeAccountToken") @default(autoincrement())
+  EmployeeId  Int
+  Token       String   @db.VarChar(6)
+  Expdate     DateTime @db.DateTime
+  CreatedDate DateTime @default(now(), map: "DF_EmployeeAccountToken_CreatedDate") @db.DateTime
+}
+
+model EmployeeCampaigns {
+  Id          Int      @id(map: "PK_CampaignUser") @default(autoincrement())
+  EmployeeId  Int
+  CampaignId  Int
+  isPM        Boolean?
+  CreatedDate DateTime @default(now(), map: "DF_EmployeeCampaigns_CreatedDate") @db.DateTime
+}
+
+model EmployeeContract {
+  Id               Int       @id(map: "PK_EmployeeContract") @default(autoincrement())
+  EmployeeId       Int
+  StartOnboardDate DateTime? @db.Date
+  EndOnboardDate   DateTime? @db.Date
+  Result           Int?
+  AssessmentDate   DateTime? @db.DateTime
+  Comment          String?   @db.NVarChar(1024)
+  CreatedDate      DateTime  @default(now(), map: "DEFAULT_EmployeeContract_CreatedDate") @db.DateTime
+  UpdatedDate      DateTime? @db.DateTime
+}
+
+model EmployeeContracts {
+  Id           Int       @id(map: "PK_EmployeeContracts") @default(autoincrement())
+  EmployeeId   Int
+  ContractCode String?   @db.VarChar(32)
+  TypeContract Int?
+  Period       Int?
+  ContractFrom DateTime? @db.Date
+  ContractTo   DateTime? @db.Date
+  Status       Int?
+  Note         String?   @db.NVarChar(1024)
+  CreatedDate  DateTime  @default(now(), map: "DEFAULT_EmployeeContracts_CreatedDate") @db.DateTime
+  UpdatedDate  DateTime? @db.DateTime
+  AttachFile   String?   @db.NVarChar(512)
+  isDeleted    Boolean?
+  WorkingType  String?   @db.VarChar(128)
+}
+
+model EmployeeEducations {
+  Id               Int       @id(map: "PK_EmployeeEducations") @default(autoincrement())
+  EmployeeCode     String?   @db.VarChar(128)
+  EmployeeId       Int
+  SchoolName       String?   @db.NVarChar(128)
+  EducationLevel   String?   @db.NVarChar(64)
+  Diploma          String?   @db.NVarChar(128)
+  Majors           String?   @db.NVarChar(128)
+  Start            DateTime? @db.Date
+  End              DateTime? @db.Date
+  YearOfGraduation Int?
+  CreatedDate      DateTime  @default(now(), map: "DF_EmployeeEducations_CreatedDate") @db.DateTime
+}
+
+model EmployeeEmergencyContact {
+  Id           Int      @id(map: "PK_EmployeeEmergencyContact") @default(autoincrement())
+  EmployeeId   Int
+  FullName     String?  @db.NVarChar(128)
+  Relationship String?  @db.NVarChar(64)
+  Phone        String?  @db.VarChar(10)
+  Address      String?  @db.NVarChar(512)
+  CreatedDate  DateTime @default(now(), map: "DF_EmployeeEmergencyContact_CreatedDate") @db.DateTime
+}
+
+model EmployeeExperiences {
+  Id             Int       @id(map: "PK_EmployeeExperience") @default(autoincrement())
+  EmployeeId     Int
+  CompanyName    String?   @db.NVarChar(128)
+  PositionName   String?   @db.NVarChar(128)
+  ExperienceTime Float?
+  FromDate       DateTime? @db.Date
+  ToDate         DateTime? @db.Date
+  WorkExperience String?   @db.NVarChar(1024)
+  ReasonForQuit  String?   @db.NVarChar(512)
+  CreatedDate    DateTime? @default(now(), map: "DF_EmployeeExperience_CreatedDate") @db.DateTime
+}
+
+model EmployeeForeignLanguage {
+  Id           Int      @id(map: "PK_EmployeeForeignLanguage") @default(autoincrement())
+  EmployeeId   Int
+  LanguageName String?  @db.NVarChar(32)
+  Diploma      String?  @db.VarChar(16)
+  Start        Int?
+  End          Int?
+  CreatedDate  DateTime @default(now(), map: "DF_EmployeeForeignLanguage_CreatedDate") @db.DateTime
+}
+
+/// The underlying table does not contain a valid unique identifier and can therefore currently not be handled by Prisma Client.
+model EmployeeLog {
+  IdLog       Int       @default(autoincrement())
+  EmployeeId  Int
+  ChangeType  String    @db.VarChar(50)
+  Content     String?   @db.NVarChar(612)
+  CreatedDate DateTime? @db.DateTime
+  UpdatedDate DateTime? @db.DateTime
+
+  @@ignore
+}
+
+model EmployeeRefreshTokens {
+  Id              Int       @id(map: "PK_EmployeeRefreshTokens") @default(autoincrement())
+  EmployeeId      Int?
+  RefreshToken    String?   @db.VarChar(64)
+  RefreshTokenExp DateTime? @db.DateTime
+  AccessToken     String?   @db.VarChar(1024)
+  AccessTokenExp  DateTime? @db.DateTime
+  RemoteIpAddress String?   @db.VarChar(32)
+  CreatedDate     DateTime? @db.DateTime
+}
+
+model EmployeeRelatives {
+  Id           Int       @id(map: "PK_EmployeeRelatives") @default(autoincrement())
+  EmployeeId   Int
+  RelativeName String?   @db.NVarChar(64)
+  Relationship String?   @db.NVarChar(32)
+  Occupation   String?   @db.NVarChar(64)
+  LocationWork String?   @db.NVarChar(128)
+  CreatedDate  DateTime? @default(now(), map: "DF_EmployeeRelatives_CreatedDate") @db.DateTime
+}
+
+model EmployeeRoles {
+  AutoId      Int      @id(map: "PK_EmployeeRoles") @default(autoincrement())
+  RoleId      Int
+  EmployeeId  Int
+  CreatedDate DateTime @default(now(), map: "DF_EmployeeRoles_CreatedDate") @db.DateTime
+
+  @@unique([EmployeeId, RoleId], map: "IX_EmployeeRoles")
+}
+
+model Employees {
+  EmployeeId            Int       @id(map: "PK_Employees") @default(autoincrement())
+  ParentRoleId          Int?
+  EmployeeCode          String    @db.VarChar(32)
+  FirstName             String?   @db.NVarChar(64)
+  LastName              String?   @db.NVarChar(64)
+  FullName              String    @db.NVarChar(129)
+  BirthDay              DateTime? @db.Date
+  MonthOfBirth          Int?
+  BirthPlace            String?   @db.NVarChar(32)
+  Gender                Boolean?
+  Mobile                String?   @db.VarChar(32)
+  Email                 String?   @db.VarChar(128)
+  JoinDate              DateTime? @db.Date
+  PersonalEmail         String?   @db.VarChar(128)
+  ResignDate            DateTime? @db.Date
+  EmploymentType        Int?
+  ParentId              Int?
+  Address               String?   @db.NVarChar(256)
+  PositionId            Int?
+  IDNumber              String?   @db.VarChar(16)
+  IDNumDate             DateTime? @db.Date
+  IDNumAddress          String?   @db.NVarChar(256)
+  MaritalStatus         Int?
+  EducationId           Int?
+  DepartmentId          Int?
+  TaxCode               String?   @db.VarChar(13)
+  Nationality           String?   @db.NVarChar(64)
+  Ethnic                String?   @db.NVarChar(32)
+  Active                Boolean?
+  CreateBy              Int?
+  UpdateBy              Int?
+  CreatedDate           DateTime? @db.DateTime
+  UpdateDate            DateTime? @db.DateTime
+  Administrator         Boolean?
+  ProfileImage          String?   @db.NVarChar(1024)
+  isSystem              Boolean?
+  FirstChangePassword   Boolean?  @default(false, map: "DF_Employees_FirstChangePassword")
+  ContactAddress        String?   @db.NVarChar(256)
+  SocialInsuranceNumber String?   @db.VarChar(64)
+  HealthInsurancePlace  String?   @db.NVarChar(256)
+}
+
+model EmployeeWorkHistory {
+  Id           Int       @id(map: "PK_EmployeeWorkHistory") @default(autoincrement())
+  EmployeeId   Int?
+  DepartmentId Int?
+  PositionId   Int?
+  ParentId     Int?
+  LocationId   Int?
+  StartDate    DateTime? @db.Date
+  CreatedDate  DateTime  @default(now(), map: "DEFAULT_EmployeeWorkHistory_CreatedDate") @db.DateTime
+}
+
+model HrmBonus {
+  IdBonus       Int       @id(map: "PK_HrmBonus") @default(autoincrement())
+  EmployeeId    Int?
+  BonusType     Int?
+  RewardContent String?   @db.NVarChar(256)
+  ProfileNumber String?   @db.VarChar(32)
+  RewardForm    String?   @db.NVarChar(128)
+  IsDelete      Int?
+  CreatedBy     Int?
+  CreatedDate   DateTime? @db.DateTime
+}
+
+model HrmProcess {
+  HrmProcessId       Int       @id(map: "PK_DismissalProcess") @default(autoincrement())
+  ProcessType        String?   @db.VarChar(50)
+  EmployeeId         Int?
+  ProcessName        String?   @db.NVarChar(128)
+  CompletionDeadline DateTime? @db.DateTime
+  Status             Int?
+  Note               String?   @db.NVarChar(512)
+  IsDelete           Int?
+  CreateDate         DateTime? @db.DateTime
+  UpdateDate         DateTime? @db.DateTime
+}
+
+model JobAppointment {
+  IdAppoint           Int       @id(map: "PK_JobAppointment") @default(autoincrement())
+  EmployeeId          Int?
+  EmployeeCode        String?   @db.VarChar(128)
+  WorkUnit            Int?
+  AppointmentUnit     Int?
+  DecisionNumber      String?   @db.VarChar(128)
+  PositionId          Int?
+  AppointmentPosition Int?
+  AppointmentProcess  Int?
+  Status              Int?
+  IsDelete            Int?
+  CreatedDate         DateTime? @db.DateTime
+  UpdatedDate         DateTime? @db.DateTime
+}
+
+model JobTransfer {
+  IdTransfer      Int       @id(map: "PK_JobTransfer") @default(autoincrement())
+  EmployeeId      Int?
+  EmployeeCode    String?   @db.VarChar(128)
+  WorkUnit        Int?
+  AppointmentUnit Int?
+  DecisionNumber  String?   @db.VarChar(128)
+  PositionId      Int?
+  NewJobPosition  Int?
+  TransferProcess Int?
+  Status          Int?
+  IsDelete        Int?
+  CreatedDate     DateTime? @db.DateTime
+  UpdatedDate     DateTime? @db.DateTime
+}
+
+model LeaveProcess {
+  TerminationProcessId Int       @id(map: "PK_LeaveProcess") @default(autoincrement())
+  JobName              String?   @db.NVarChar(50)
+  Executor             String?   @db.NVarChar(50)
+  Deadline             DateTime? @db.DateTime
+  Note                 String?   @db.NVarChar(512)
+  AttachFile           String?   @db.NVarChar(1024)
+  CreatedDate          DateTime? @db.DateTime
+  UpdatedDate          DateTime? @db.DateTime
+}
+
+/// The underlying table does not contain a valid unique identifier and can therefore currently not be handled by Prisma Client.
+model Location_Districts {
+  DistrictId     Int
+  DistrictName   String? @db.NVarChar(128)
+  DistrictPrefix String? @db.NVarChar(32)
+  ProvinceId     Int?
+
+  @@ignore
+}
+
+/// The underlying table does not contain a valid unique identifier and can therefore currently not be handled by Prisma Client.
+model Location_Provinces {
+  ProvinceId   Int
+  ProvinceName String? @db.NVarChar(128)
+  ProvinceCode String? @db.NVarChar(32)
+
+  @@ignore
+}
+
+/// The underlying table does not contain a valid unique identifier and can therefore currently not be handled by Prisma Client.
+model Location_Wards {
+  WardId     Int
+  WardName   String  @db.NVarChar(128)
+  WardPrefix String? @db.NVarChar(32)
+  ProvinceId Int?
+  DistrictId Int?
+
+  @@ignore
+}
+
+/// The underlying table does not contain a valid unique identifier and can therefore currently not be handled by Prisma Client.
+model Locations {
+  LocationId   Int       @default(autoincrement())
+  LocationName String?   @db.NVarChar(512)
+  CreateDate   DateTime? @default(now(), map: "DF_Locations_CreateDate") @db.DateTime
+
+  @@ignore
+}
+
+model MenuPermissions {
+  PermissionId   Int     @id(map: "PK_RolePermission") @default(autoincrement())
+  MenuId         Int?
+  PermissionCode String? @db.VarChar(32)
+  PermissionName String? @db.NVarChar(256)
+  index          Int?
+}
+
+model Menus {
+  MenuId      Int      @id(map: "PK_Menus")
+  MenuGroup   String?  @db.VarChar(32)
+  MenuParent  Int      @default(0, map: "DF_Menus_MenuParent")
+  MenuName    String   @db.NVarChar(128)
+  MenuUrl     String   @db.VarChar(128)
+  MenuIcon    String?  @db.VarChar(64)
+  MenuType    String   @default("item", map: "DF_Menus_MenuType") @db.VarChar(16)
+  Active      Boolean  @default(true, map: "DF_Menus_Active")
+  SortList    Float?   @default(1, map: "DF_Menus_SortList")
+  CreatedDate DateTime @default(now(), map: "DF_Menus_CreatedDate") @db.DateTime
+}
+
+model Positions {
+  PositionId   Int      @id(map: "PK_Positions") @default(autoincrement())
+  CompanyId    Int?
+  DepartmentId Int
+  PositionCode String   @db.VarChar(32)
+  PositionName String   @db.NVarChar(128)
+  Level        String?  @db.VarChar(32)
+  CreatedDate  DateTime @default(now(), map: "DF_Positions_CreatedDate") @db.DateTime
+  Active       Boolean  @default(true, map: "DF_Positions_Active")
+}
+
+model RolePermissions {
+  Id           Int      @id(map: "PK_RoleDetails") @default(autoincrement())
+  RoleId       Int
+  MenuId       Int
+  PermissionId Int
+  IsPermission Boolean  @default(false, map: "DF_RoleDetails_IsPermission")
+  CreatedDate  DateTime @default(now(), map: "DF_RoleDetails_CreatedDate") @db.DateTime
+
+  @@index([RoleId, IsPermission], map: "missing_index_336_335")
+  @@index([IsPermission], map: "missing_index_338_337")
+}
+
+model Roles {
+  RoleId       Int      @id(map: "PK_Roles") @default(autoincrement())
+  ParentId     Int?
+  RoleName     String   @unique(map: "IX_Roles") @db.NVarChar(128)
+  Descriptions String?  @db.NVarChar(256)
+  CreatedDate  DateTime @default(now(), map: "DF_Roles_CreatedDate") @db.DateTime
+  Active       Boolean  @default(true, map: "DF_Roles_Active")
+}
+
+model StopWorking {
+  IdStopWorking        Int       @id(map: "PK_StopWorking") @default(autoincrement())
+  EmployeeId           Int?
+  WorkUnit             Int?
+  Department           Int?
+  PositionId           Int?
+  Reason               String?   @db.NVarChar(512)
+  RetirementDate       DateTime? @db.DateTime
+  DecisionNumber       String?   @db.VarChar(32)
+  TerminationProcessId Int?
+  IsDelete             Int?
+  CreatedDate          DateTime? @db.DateTime
+  UpdatedDate          DateTime? @db.DateTime
+}

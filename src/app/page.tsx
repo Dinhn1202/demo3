@@ -1,6 +1,33 @@
+import { GetServerSideProps } from 'next';
 import Image from 'next/image'
+import { useState } from 'react'
+import { prisma } from '../../lib/prisma'
 
-export default function Home() {
+interface Departments {
+  departments: {
+    DepartmentId: string
+    CompanyId: string
+    DepartmentCode: string
+    DepartmentName: string
+    Active: string
+    CreatedDate: string
+    AllowCompensationLeave: string
+  }[]
+}
+
+const Home = ({ departments }: Departments) => {
+  // useEffect(() => {
+  //   get();
+  // }, []);
+
+
+  // async function get() {
+  //   const res = await fetch("http://localhost:3000/api/departments");
+  //   const departments = await res.json();
+  //   setDepartments(departments);
+  // };
+  console.log(departments);
+
   return (
     <main className="flex min-h-screen flex-col items-center justify-between p-24">
       <div className="z-10 w-full max-w-5xl items-center justify-between font-mono text-sm lg:flex">
@@ -108,6 +135,31 @@ export default function Home() {
           </p>
         </a>
       </div>
+      <div>
+      {departments?.map(note => (
+            <li key={note.DepartmentId} className="border-b border-gray-600 p-2">
+              <div className="flex justify-between">
+                <div className="flex-1">
+                  <h3 className="font-bold">{note.DepartmentCode}</h3>
+                  <p className="text-sm">{note.DepartmentName}</p>
+                </div>
+              </div>
+            </li>
+          ))}
+      </div>
     </main>
   )
+}
+
+
+export default Home
+
+export const getServerSideProps: GetServerSideProps = async () => {
+  const departments = await prisma.departments.findMany();
+
+  return {
+    props: {
+      departments
+    }
+  }
 }
